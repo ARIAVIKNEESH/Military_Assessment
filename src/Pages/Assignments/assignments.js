@@ -1,11 +1,11 @@
-// src/pages/Assignments.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import './Assignments.css';
 
 const Assignments = () => {
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
   const assignedBase = localStorage.getItem('assignedBase');
+
   const [assignments, setAssignments] = useState([]);
   const [assignedTo, setAssignedTo] = useState('');
   const [equipmentType, setEquipmentType] = useState('');
@@ -16,33 +16,48 @@ const Assignments = () => {
   const [selectedBase, setSelectedBase] = useState(assignedBase);
   const [filterPerson, setFilterPerson] = useState('');
 
+  const fetchBases = useCallback(async () => {
+    try {
+      const res = await fetch('http://localhost:5001/api/bases', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setAllBases(data);
+    } catch (error) {
+      console.error('Error fetching bases:', error);
+    }
+  }, [token]);
+
+  const fetchAssignments = useCallback(async () => {
+    try {
+      const res = await fetch('http://localhost:5001/api/assignments', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      let filtered = data;
+
+      if (role === 'commander') {
+        filtered = data.filter((a) => a.base === assignedBase);
+      } else if (role === 'admin' && selectedBase) {
+        filtered = data.filter((a) => a.base === selectedBase);
+      }
+
+      if (filterPerson) {
+        filtered = filtered.filter((a) =>
+          a.assignedTo.toLowerCase().includes(filterPerson.toLowerCase())
+        );
+      }
+
+      setAssignments(filtered);
+    } catch (error) {
+      console.error('Error fetching assignments:', error);
+    }
+  }, [token, role, assignedBase, selectedBase, filterPerson]);
+
   useEffect(() => {
     if (role === 'admin') fetchBases();
     fetchAssignments();
-  }, [selectedBase]);
-
-  const fetchBases = async () => {
-    const res = await fetch('http://localhost:5001/api/bases', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setAllBases(data);
-  };
-
-  const fetchAssignments = async () => {
-    const res = await fetch('http://localhost:5001/api/assignments', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    let filtered = data;
-    if (role === 'commander') {
-      filtered = data.filter(a => a.base === assignedBase);
-    }
-    if (filterPerson) {
-      filtered = filtered.filter(a => a.assignedTo.includes(filterPerson));
-    }
-    setAssignments(filtered);
-  };
+  }, [role, fetchBases, fetchAssignments]);
 
   const handleAdd = async () => {
     if (!assignedTo || !equipmentType || !quantity) return alert('Fill all fields');
@@ -51,50 +66,58 @@ const Assignments = () => {
       assignedTo,
       equipmentType,
       quantity: parseInt(quantity),
-      base: role === 'admin' ? selectedBase : assignedBase
+      base: role === 'admin' ? selectedBase : assignedBase,
     };
 
-    const res = await fetch('http://localhost:5001/api/assignments', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    });
+    try {
+      const res = await fetch('http://localhost:5001/api/assignments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
 
-    if (res.ok) {
-      setAssignedTo('');
-      setEquipmentType('');
-      setQuantity('');
-      fetchAssignments();
+      if (res.ok) {
+        setAssignedTo('');
+        setEquipmentType('');
+        setQuantity('');
+        fetchAssignments();
+      }
+    } catch (error) {
+      console.error('Error adding assignment:', error);
     }
   };
 
   const handleUpdate = async (id) => {
-    const original = assignments.find(a => a._id === id);
+    const original = assignments.find((a) => a._id === id);
     if (!original) return;
 
     const body = {
       assignedTo: original.assignedTo,
       equipmentType: original.equipmentType,
       quantity: parseInt(editingQuantity),
-      base: original.base
+      base: original.base,
     };
 
-    const res = await fetch('http://localhost:5001/api/assignments', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    });
+    try {
+      const res = await fetch('http://localhost:5001/api/assignments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
 
-    if (res.ok) {
-      setEditingId(null);
-      setEditingQuantity('');
-      fetchAssignments();
+      if (res.ok) {
+        setEditingId(null);
+        setEditingQuantity('');
+        fetchAssignments();
+      }
+    } catch (error) {
+      console.error('Error updating assignment:', error);
     }
   };
 
@@ -105,10 +128,16 @@ const Assignments = () => {
       {role === 'admin' && (
         <div className="assignments-field">
           <label>Choose Base:</label>
-          <select value={selectedBase} onChange={(e) => setSelectedBase(e.target.value)} className="assignments-select">
+          <select
+            value={selectedBase}
+            onChange={(e) => setSelectedBase(e.target.value)}
+            className="assignments-select"
+          >
             <option value="">-- Select --</option>
             {allBases.map((b) => (
-              <option key={b._id} value={b._id}>{b.name}</option>
+              <option key={b._id} value={b._id}>
+                {b.name}
+              </option>
             ))}
           </select>
         </div>
@@ -137,7 +166,9 @@ const Assignments = () => {
             onChange={(e) => setQuantity(e.target.value)}
             className="assignments-input"
           />
-          <button onClick={handleAdd} className="assignments-button">Add Assignment</button>
+          <button onClick={handleAdd} className="assignments-button">
+            Add Assignment
+          </button>
         </div>
       )}
 
@@ -149,7 +180,9 @@ const Assignments = () => {
           onChange={(e) => setFilterPerson(e.target.value)}
           className="assignments-input"
         />
-        <button onClick={fetchAssignments} className="assignments-button">Apply Filter</button>
+        <button onClick={fetchAssignments} className="assignments-button">
+          Apply Filter
+        </button>
       </div>
 
       <table className="assignments-table">
@@ -185,12 +218,22 @@ const Assignments = () => {
               {role === 'commander' && (
                 <td>
                   {editingId === a._id ? (
-                    <button onClick={() => handleUpdate(a._id)} className="assignments-button">Save</button>
+                    <button
+                      onClick={() => handleUpdate(a._id)}
+                      className="assignments-button"
+                    >
+                      Save
+                    </button>
                   ) : (
-                    <button onClick={() => {
-                      setEditingId(a._id);
-                      setEditingQuantity(a.quantity);
-                    }} className="assignments-button">Edit</button>
+                    <button
+                      onClick={() => {
+                        setEditingId(a._id);
+                        setEditingQuantity(a.quantity);
+                      }}
+                      className="assignments-button"
+                    >
+                      Edit
+                    </button>
                   )}
                 </td>
               )}
