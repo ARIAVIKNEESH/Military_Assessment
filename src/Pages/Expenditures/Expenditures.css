@@ -1,0 +1,66 @@
+.expenditures-container {
+  padding: 20px;
+  max-width: 1000px;
+  margin: auto;
+  background-color: #fefefe;
+  border-radius: 8px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.expenditures-title {
+  font-size: 26px;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.expenditures-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.expenditures-select,
+.expenditures-input,
+.expenditures-input-small {
+  padding: 8px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.expenditures-input-small {
+  width: 80px;
+}
+
+.expenditures-button {
+  padding: 8px 14px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.expenditures-button:hover {
+  background-color: #c0392b;
+}
+
+.expenditures-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.expenditures-table th,
+.expenditures-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.expenditures-table th {
+  background-color: #f9f9f9;
+}

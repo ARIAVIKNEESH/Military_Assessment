@@ -1,0 +1,69 @@
+.purchases-container {
+  padding: 20px;
+  max-width: 1000px;
+  margin: auto;
+  background: #f9f9f9;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+}
+
+.purchases-title {
+  font-size: 26px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.purchases-field,
+.purchases-add,
+.purchases-filters {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.purchases-select,
+.purchases-input,
+.purchases-input-small {
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.purchases-input-small {
+  width: 80px;
+}
+
+.purchases-button {
+  background-color: #2980b9;
+  color: white;
+  padding: 8px 14px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.purchases-button:hover {
+  background-color: #1f6391;
+}
+
+.purchases-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.purchases-table th,
+.purchases-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.purchases-table th {
+  background-color: #ecf0f1;
+}

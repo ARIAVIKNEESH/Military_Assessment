@@ -1,0 +1,92 @@
+.dashboard-container {
+  padding: 24px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8fafd;
+  border-radius: 10px;
+  max-width: 880px;
+  margin: 40px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease-in-out;
+}
+
+.dashboard-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.dashboard-select-wrapper {
+  margin-bottom: 20px;
+}
+
+.dashboard-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.dashboard-select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  transition: border 0.2s;
+}
+
+.dashboard-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.dashboard-info {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 18px;
+  color: #2c3e50;
+  background-color: #eef3f8;
+  padding: 10px 14px;
+  border-radius: 6px;
+}
+
+.dashboard-data {
+  background-color: #ffffff;
+  padding: 20px 24px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-top: 24px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.dashboard-data p {
+  margin: 10px 0;
+  font-size: 16px;
+  color: #444;
+}
+
+.dashboard-breakdown {
+  margin-left: 24px;
+  margin-bottom: 12px;
+  list-style-type: disc;
+  padding-left: 16px;
+  color: #444;
+}
+
+.dashboard-loading {
+  color: #777;
+  font-style: italic;
+  text-align: center;
+  margin-top: 30px;
+  font-size: 16px;
+}
+
+.dashboard-error {
+  color: #e74c3c;
+  font-weight: 600;
+  margin-top: 16px;
+  text-align: center;
+}

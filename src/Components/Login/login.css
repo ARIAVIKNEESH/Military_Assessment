@@ -1,0 +1,95 @@
+/* src/pages/login.css */
+
+/* New wrapper to center login */
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* full screen */
+  background-color: #121212; /* optional background */
+  margin: 0;
+  padding: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 2em;
+  background-color: #171717;
+  border-radius: 25px;
+  transition: 0.4s ease-in-out;
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-form:hover {
+  transform: scale(1.03);
+  border: 1px solid #000;
+}
+
+#login-heading {
+  text-align: center;
+  margin: 1em 0;
+  color: #ffffff;
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.login-field {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  border-radius: 25px;
+  padding: 0.8em;
+  background-color: #1f1f1f;
+  box-shadow: inset 2px 5px 10px rgb(5, 5, 5);
+}
+
+.login-input-icon {
+  height: 1.3em;
+  width: 1.3em;
+  fill: white;
+}
+
+.login-input-field {
+  background: none;
+  border: none;
+  outline: none;
+  width: 100%;
+  color: #d3d3d3;
+  font-size: 1rem;
+}
+
+.login-btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5em;
+}
+
+.login-button2 {
+  padding: 0.6em 2.5em;
+  border-radius: 5px;
+  border: none;
+  background-color: #252525;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: 0.4s ease-in-out;
+}
+
+.login-button2:hover {
+  background-color: black;
+}
+
+.login-signup-link {
+  color: #ccc;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.login-signup-link a {
+  color: #f0f0f0;
+  text-decoration: underline;
+}
