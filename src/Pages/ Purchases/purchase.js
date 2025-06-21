@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import './Purchases.css';
 
 const Purchases = () => {
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
   const baseId = localStorage.getItem('assignedBase');
+
   const [purchases, setPurchases] = useState([]);
   const [equipmentType, setEquipmentType] = useState('');
   const [quantity, setQuantity] = useState('');
@@ -15,37 +16,52 @@ const Purchases = () => {
   const [filterType, setFilterType] = useState('');
   const [filterDate, setFilterDate] = useState('');
 
+  const fetchBases = useCallback(async () => {
+    try {
+      const res = await fetch('http://localhost:5001/api/bases', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setAllBases(data);
+    } catch (error) {
+      console.error('Error fetching bases:', error);
+    }
+  }, [token]);
+
+  const fetchPurchases = useCallback(async () => {
+    try {
+      const res = await fetch(`http://localhost:5001/api/purchases`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      let filtered = data;
+
+      if (role === 'commander') {
+        filtered = data.filter((p) => p.base === baseId);
+      } else if (role === 'admin' && selectedBase) {
+        filtered = data.filter((p) => p.base === selectedBase);
+      }
+
+      if (filterType) {
+        filtered = filtered.filter((p) =>
+          p.equipmentType.toLowerCase().includes(filterType.toLowerCase())
+        );
+      }
+
+      if (filterDate) {
+        filtered = filtered.filter((p) => p.date.startsWith(filterDate));
+      }
+
+      setPurchases(filtered);
+    } catch (error) {
+      console.error('Error fetching purchases:', error);
+    }
+  }, [token, role, baseId, selectedBase, filterType, filterDate]);
+
   useEffect(() => {
     if (role === 'admin') fetchBases();
     fetchPurchases();
-  }, [selectedBase]);
-
-  const fetchBases = async () => {
-    const res = await fetch('http://localhost:5001/api/bases', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setAllBases(data);
-  };
-
-  const fetchPurchases = async () => {
-    let url = `http://localhost:5001/api/purchases`;
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    let filtered = data;
-    if (role === 'commander') {
-      filtered = data.filter(p => p.base === baseId);
-    }
-    if (filterType) {
-      filtered = filtered.filter(p => p.equipmentType.includes(filterType));
-    }
-    if (filterDate) {
-      filtered = filtered.filter(p => p.date.startsWith(filterDate));
-    }
-    setPurchases(filtered);
-  };
+  }, [role, fetchBases, fetchPurchases]);
 
   const handleAddPurchase = async () => {
     if (!equipmentType || !quantity) return alert('Fill all fields');
@@ -55,24 +71,28 @@ const Purchases = () => {
       base: role === 'admin' ? selectedBase : baseId,
     };
 
-    const res = await fetch('http://localhost:5001/api/purchases', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    });
+    try {
+      const res = await fetch('http://localhost:5001/api/purchases', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
 
-    if (res.ok) {
-      setEquipmentType('');
-      setQuantity('');
-      fetchPurchases();
+      if (res.ok) {
+        setEquipmentType('');
+        setQuantity('');
+        fetchPurchases();
+      }
+    } catch (error) {
+      console.error('Error adding purchase:', error);
     }
   };
 
   const handleUpdate = async (id) => {
-    const updated = purchases.find(p => p._id === id);
+    const updated = purchases.find((p) => p._id === id);
     if (!updated) return;
 
     const body = {
@@ -81,19 +101,23 @@ const Purchases = () => {
       base: updated.base,
     };
 
-    const res = await fetch(`http://localhost:5001/api/purchases`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    });
+    try {
+      const res = await fetch(`http://localhost:5001/api/purchases`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
 
-    if (res.ok) {
-      setEditingId(null);
-      setEditingQuantity(0);
-      fetchPurchases();
+      if (res.ok) {
+        setEditingId(null);
+        setEditingQuantity(0);
+        fetchPurchases();
+      }
+    } catch (error) {
+      console.error('Error updating purchase:', error);
     }
   };
 
@@ -135,7 +159,9 @@ const Purchases = () => {
             onChange={(e) => setQuantity(e.target.value)}
             className="purchases-input"
           />
-          <button onClick={handleAddPurchase} className="purchases-button">Add Purchase</button>
+          <button onClick={handleAddPurchase} className="purchases-button">
+            Add Purchase
+          </button>
         </div>
       )}
 
@@ -152,7 +178,9 @@ const Purchases = () => {
           onChange={(e) => setFilterDate(e.target.value)}
           className="purchases-input"
         />
-        <button onClick={fetchPurchases} className="purchases-button">Apply Filters</button>
+        <button onClick={fetchPurchases} className="purchases-button">
+          Apply Filters
+        </button>
       </div>
 
       <table className="purchases-table">
@@ -186,12 +214,22 @@ const Purchases = () => {
               {role === 'commander' && (
                 <td>
                   {editingId === p._id ? (
-                    <button onClick={() => handleUpdate(p._id)} className="purchases-button">Save</button>
+                    <button
+                      onClick={() => handleUpdate(p._id)}
+                      className="purchases-button"
+                    >
+                      Save
+                    </button>
                   ) : (
-                    <button onClick={() => {
-                      setEditingId(p._id);
-                      setEditingQuantity(p.quantity);
-                    }} className="purchases-button">Edit</button>
+                    <button
+                      onClick={() => {
+                        setEditingId(p._id);
+                        setEditingQuantity(p.quantity);
+                      }}
+                      className="purchases-button"
+                    >
+                      Edit
+                    </button>
                   )}
                 </td>
               )}
