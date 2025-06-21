@@ -31,7 +31,6 @@ const Navbar = () => {
 
   const isAdmin = role === 'admin';
   const isCommander = role === 'commander';
-  const isLogistics = role === 'logistics';
 
   return (
     <nav className="navbar-container">
